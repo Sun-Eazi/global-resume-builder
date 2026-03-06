@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES — Brand Theme
+   ============================================================ */
+:root {
+  --color-primary: #0A84FF;
+  --color-primary-dark: #0060DF;
+  --color-primary-light: #70BFFF;
+  --color-accent: #FF6B35;
+  --color-bg: #0B0E1A;
+  --color-surface: #111827;
+  --color-surface-light: #1F2937;
+  --color-border: #1E293B;
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #9CA3AF;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   FONT UTILITIES
+   ============================================================ */
+.font-display {
+  font-family: var(--font-syne), sans-serif;
+}
+
+.font-dm-sans {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-mono), monospace;
+}
+
+/* ============================================================
+   GLASSMORPHISM UTILITIES
+   ============================================================ */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-card {
+  @apply glass rounded-2xl;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.08); opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease forwards;
+}
+
+.animate-slide-right {
+  animation: slide-in-right 0.4s ease forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.1) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.input {
+  @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm
+         placeholder-gray-500 outline-none transition-all duration-200
+         focus:border-blue-500/50 focus:bg-white/8 focus:ring-2 focus:ring-blue-500/10;
+}
+
+.label {
+  @apply block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wide;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500
+         text-white font-medium px-5 py-2.5 rounded-xl transition-all duration-200
+         shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 hover:-translate-y-0.5
+         disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10
+         border border-white/10 text-white font-medium px-5 py-2.5 rounded-xl
+         transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-danger {
+  @apply inline-flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20
+         border border-red-500/20 text-red-400 font-medium px-5 py-2.5 rounded-xl
+         transition-all duration-200;
+}
+
+/* ============================================================
+   RESUME PREVIEW STYLES (for PDF generation)
+   ============================================================ */
+.resume-preview {
+  font-family: 'DM Sans', sans-serif;
+  color: #111827;
+  background: white;
+}
+
+/* ============================================================
+   SKELETON LOADING
+   ============================================================ */
+.skeleton {
+  @apply animate-shimmer bg-white/5 rounded;
+}
