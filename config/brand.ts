@@ -10,6 +10,7 @@ export const brand = {
   appDescription: "Build stunning resumes that get you hired — in minutes.",
   companyName: "Global Resume Builder Inc.",
   companyWebsite: "https://globalresumebuilder.com",
+  author: "Linus Lucas Rwechoka",
 
   // Logo (path to /public folder or external URL)
   logoUrl: "/logo.svg",

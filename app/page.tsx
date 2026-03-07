@@ -301,7 +301,9 @@ export default function LandingPage() {
 
         <footer className="custom-footer">
           <div className="footer-inner">
-            <span style={{ color: "var(--muted)", fontSize: "13px" }}>© {new Date().getFullYear()} {brand.companyName}.</span>
+            <div className="text-gray-400 text-sm">
+              &copy; {new Date().getFullYear()} Built by {brand.author}.
+            </div>
             <div className="footer-links">
               <a href="#" className="footer-link">Privacy</a>
               <a href="#" className="footer-link">Terms</a>
