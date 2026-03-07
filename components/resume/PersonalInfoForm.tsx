@@ -10,6 +10,7 @@ interface PersonalInfoFormProps {
 }
 
 export default function PersonalInfoForm({ resumeId, data, onChange }: PersonalInfoFormProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
   const [form, setForm] = useState<Partial<PersonalInfo>>({
     full_name: "",
     email: "",
@@ -31,6 +32,27 @@ export default function PersonalInfoForm({ resumeId, data, onChange }: PersonalI
     const updated = { ...form, [field]: value, resume_id: resumeId } as PersonalInfo;
     setForm(updated);
     onChange(updated);
+  };
+
+  const handleGenerateSummary = async () => {
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/ai/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "summary",
+          prompt: `Write a professional summary for a ${form.job_title || "professional"}. Keep it concise and impactful.`
+        })
+      });
+      if (res.ok) {
+        const { text } = await res.json();
+        update("summary", text);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setIsGenerating(false);
   };
 
   const fields: { key: keyof PersonalInfo; label: string; placeholder: string; type?: string }[] = [
@@ -70,7 +92,22 @@ export default function PersonalInfoForm({ resumeId, data, onChange }: PersonalI
 
       {/* Summary */}
       <div>
-        <label className="label">Professional Summary</label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="label" style={{ marginBottom: 0 }}>Professional Summary</label>
+          <button
+            type="button"
+            onClick={handleGenerateSummary}
+            disabled={isGenerating}
+            className="text-xs text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+          >
+            {isGenerating ? (
+              <span className="flex items-center gap-1">
+                <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                Generating...
+              </span>
+            ) : "✨ Generate with AI"}
+          </button>
+        </div>
         <textarea
           value={form.summary || ""}
           onChange={(e) => update("summary", e.target.value)}

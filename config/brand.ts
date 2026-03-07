@@ -55,7 +55,7 @@ export const brand = {
     publicResumes: true,       // Allow public shareable resume links
     pdfExport: true,           // Allow PDF download
     multipleResumes: true,     // Allow multiple resumes per user
-    aiSuggestions: false,      // AI-powered content suggestions (future)
+    aiSuggestions: true,       // AI-powered content suggestions
     analytics: false,          // User analytics dashboard (future)
   },
 

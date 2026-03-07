@@ -50,10 +50,10 @@ export default async function PublicResumePage({ params }: PublicResumePageProps
   // Increment view count
   await supabase
     .from("resumes")
-    .update({ view_count: (resumeData.view_count || 0) + 1 })
-    .eq("id", resumeData.id);
+    .update({ view_count: ((resumeData as any).view_count || 0) + 1 })
+    .eq("id", (resumeData as any).id);
 
-  const resume = resumeData as Resume;
+  const resume = resumeData as unknown as Resume;
   const pi = resume.personal_info;
 
   return (
@@ -65,7 +65,7 @@ export default async function PublicResumePage({ params }: PublicResumePageProps
           <span>Resume shared via <span className="text-white">{brand.appName}</span></span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">{resumeData.view_count || 0} views</span>
+          <span className="text-xs text-gray-500">{(resumeData as any).view_count || 0} views</span>
           <a
             href={`/auth/signup`}
             className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"

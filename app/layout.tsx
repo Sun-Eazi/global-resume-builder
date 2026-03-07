@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Syne, DM_Sans, JetBrains_Mono } from "next/font/google";
 import brand from "@/config/brand";
+import { AuthProvider } from "@/hooks/useAuth";
 import "./globals.css";
 
 const syne = Syne({
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     template: brand.seo.titleTemplate,
   },
   description: brand.seo.defaultDescription,
-  keywords: brand.seo.keywords,
+  keywords: [...brand.seo.keywords],
   authors: [{ name: brand.companyName }],
   creator: brand.companyName,
   metadataBase: new URL(brand.companyWebsite),
@@ -72,7 +73,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
       </head>
       <body className="font-dm-sans bg-[#0B0E1A] text-white antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         {/* PWA Service Worker Registration */}
         <script
           dangerouslySetInnerHTML={{

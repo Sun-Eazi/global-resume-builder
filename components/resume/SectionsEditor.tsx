@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ResumeSection, SectionType } from "@/types";
-import { addSection, deleteSection, updateSection, addSectionItem, deleteSectionItem } from "@/lib/resume";
+import { addSection, deleteSection, updateSection, addSectionItem, deleteSectionItem, updateSectionItem } from "@/lib/resume";
 
 const SECTION_TYPES: { type: SectionType; label: string; icon: string }[] = [
   { type: "experience", label: "Work Experience", icon: "💼" },
@@ -24,6 +24,8 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [editingItem, setEditingItem] = useState<{ id: string; data: any } | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleAddSection = async (type: SectionType, label: string) => {
     setIsAdding(true);
@@ -61,6 +63,35 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
   const handleDeleteItem = async (itemId: string) => {
     await deleteSectionItem(itemId);
     onRefresh();
+  };
+
+  const handleSaveItem = async () => {
+    if (!editingItem) return;
+    await updateSectionItem(editingItem.id, editingItem.data);
+    setEditingItem(null);
+    onRefresh();
+  };
+
+  const handleGenerateExperience = async (company: string, position: string) => {
+    if (!editingItem) return;
+    setIsGenerating(true);
+    try {
+      const res = await fetch("/api/ai/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "experience",
+          prompt: `Write 3 strong bullet points for a ${position} at ${company}. Keep it achievements-focused.`
+        })
+      });
+      if (res.ok) {
+        const { text } = await res.json();
+        setEditingItem({ ...editingItem, data: { ...editingItem.data, description: text } });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setIsGenerating(false);
   };
 
   return (
@@ -145,20 +176,86 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
               {expandedSection === section.id && (
                 <div className="border-t border-white/5 p-4 space-y-3">
                   {section.items?.map((item) => (
-                    <div key={item.id} className="bg-white/[0.03] rounded-xl p-3 border border-white/5">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 text-xs text-gray-400 font-mono">
-                          {JSON.stringify(item.data).slice(0, 60)}...
+                    <div key={item.id} className="bg-white/[0.03] rounded-xl p-3 border border-white/5 space-y-3">
+                      {editingItem?.id === item.id ? (
+                        <div className="space-y-3">
+                          {section.type === "experience" && (
+                            <>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="label text-[10px]">Position</label>
+                                  <input
+                                    className="input text-xs p-2"
+                                    value={editingItem.data.position || ""}
+                                    onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, position: e.target.value } })}
+                                    placeholder="Software Engineer"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="label text-[10px]">Company</label>
+                                  <input
+                                    className="input text-xs p-2"
+                                    value={editingItem.data.company || ""}
+                                    onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, company: e.target.value } })}
+                                    placeholder="Google"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex justify-between items-center mb-1">
+                                  <label className="label text-[10px] m-0">Description / Bullets</label>
+                                  <button
+                                    onClick={() => handleGenerateExperience(editingItem.data.company || "a company", editingItem.data.position || "a position")}
+                                    disabled={isGenerating}
+                                    className="text-[10px] text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                                  >
+                                    {isGenerating ? "Generating..." : "✨ Generate with AI"}
+                                  </button>
+                                </div>
+                                <textarea
+                                  className="input text-xs p-2 h-24"
+                                  value={editingItem.data.description || ""}
+                                  onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })}
+                                  placeholder="• Built amazing things..."
+                                />
+                              </div>
+                            </>
+                          )}
+                          {section.type !== "experience" && (
+                            <div className="text-xs text-gray-400 italic">Editing for {section.type} is simplified in this view.</div>
+                          )}
+                          <div className="flex gap-2 justify-end">
+                            <button onClick={() => setEditingItem(null)} className="text-xs text-gray-400 hover:text-white px-2 py-1">Cancel</button>
+                            <button onClick={handleSaveItem} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded">Save</button>
+                          </div>
                         </div>
-                        <button
-                          onClick={() => handleDeleteItem(item.id)}
-                          className="text-gray-600 hover:text-red-400 transition-colors p-1 shrink-0"
-                        >
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
+                      ) : (
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 text-xs text-gray-300">
+                            {section.type === "experience" ? (
+                              <div className="font-medium">
+                                {(item.data as any).position || "New Position"} at {(item.data as any).company || "Company"}
+                                {((item.data as any).description) && <div className="text-gray-500 font-normal mt-1 truncate">{(item.data as any).description}</div>}
+                              </div>
+                            ) : (
+                              <span className="font-mono text-gray-500 truncate">{JSON.stringify(item.data).slice(0, 60)}...</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button onClick={() => setEditingItem({ id: item.id, data: { ...item.data } })} className="text-gray-500 hover:text-blue-400 p-1">
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteItem(item.id)}
+                              className="text-gray-600 hover:text-red-400 transition-colors p-1"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                   <button

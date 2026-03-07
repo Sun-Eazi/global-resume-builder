@@ -3,24 +3,30 @@ import { createServerClient } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> | { id: string } }
 ) {
-  const supabase = createServerClient();
+  // Next.js 14/15 compatibility: params may be a Promise
+  const params = await Promise.resolve(context.params);
+  const { id } = params;
 
   // Verify auth via cookie
   const cookieHeader = request.headers.get("cookie") || "";
   const authClient = createServerClient(cookieHeader);
-  const { data: { session } } = await authClient.auth.getSession();
+  const {
+    data: { session },
+  } = await authClient.auth.getSession();
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const supabase = createServerClient();
+
   // Fetch resume
   const { data: resume, error } = await supabase
     .from("resumes")
     .select(`*, personal_info(*), resume_sections(*, section_items(*))`)
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", session.user.id)
     .single();
 
@@ -28,10 +34,12 @@ export async function GET(
     return NextResponse.json({ error: "Resume not found" }, { status: 404 });
   }
 
+  let browser;
+
   try {
-    // Generate PDF via Puppeteer
     const puppeteer = await import("puppeteer");
-    const browser = await puppeteer.default.launch({
+
+    browser = await puppeteer.default.launch({
       headless: true,
       args: [
         "--no-sandbox",
@@ -40,7 +48,6 @@ export async function GET(
         "--disable-accelerated-2d-canvas",
         "--no-first-run",
         "--no-zygote",
-        "--single-process",
         "--disable-gpu",
       ],
     });
@@ -50,7 +57,7 @@ export async function GET(
 
     // Build internal URL for PDF rendering
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const renderUrl = `${baseUrl}/resume/print/${resume.id}?token=${session.access_token}`;
+    const renderUrl = `${baseUrl}/resume/print/${(resume as any).id}?token=${session.access_token}`;
 
     await page.goto(renderUrl, { waitUntil: "networkidle0", timeout: 30000 });
 
@@ -62,16 +69,26 @@ export async function GET(
 
     await browser.close();
 
-    return new NextResponse(pdfBuffer, {
+    // Convert Buffer -> Uint8Array for NextResponse compatibility
+    const pdfUint8 = new Uint8Array(pdfBuffer);
+
+    return new NextResponse(pdfUint8, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${resume.title.replace(/\s+/g, "-")}.pdf"`,
-        "Content-Length": pdfBuffer.length.toString(),
+        "Content-Disposition": `attachment; filename="${(resume as any).title.replace(
+          /\s+/g,
+          "-"
+        )}.pdf"`,
+        "Content-Length": pdfUint8.length.toString(),
       },
     });
   } catch (err) {
     console.error("PDF generation error:", err);
-    // Fallback: return HTML that the browser can print
+
+    if (browser) {
+      await browser.close();
+    }
+
     return NextResponse.json(
       { error: "PDF generation failed. Please try printing from the preview page." },
       { status: 500 }

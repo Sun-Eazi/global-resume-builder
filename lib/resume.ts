@@ -20,7 +20,13 @@ export async function getResumes(userId: string): Promise<Resume[]> {
     .order("updated_at", { ascending: false });
 
   if (error) throw new Error(error.message);
-  return data || [];
+
+  // Map resume_sections to sections for the frontend
+  return (data || []).map((r: any) => ({
+    ...r,
+    sections: r.resume_sections,
+    resume_sections: undefined
+  })) as unknown as Resume[];
 }
 
 export async function getResumeById(id: string): Promise<Resume | null> {
@@ -37,8 +43,14 @@ export async function getResumeById(id: string): Promise<Resume | null> {
     .eq("id", id)
     .single();
 
-  if (error) return null;
-  return data;
+  if (error || !data) return null;
+
+  // Map resume_sections to sections
+  return {
+    ...data,
+    sections: (data as any).resume_sections,
+    resume_sections: undefined
+  } as unknown as Resume;
 }
 
 export async function getResumeBySlug(slug: string): Promise<Resume | null> {
@@ -56,8 +68,14 @@ export async function getResumeBySlug(slug: string): Promise<Resume | null> {
     .eq("is_public", true)
     .single();
 
-  if (error) return null;
-  return data;
+  if (error || !data) return null;
+
+  // Map resume_sections to sections
+  return {
+    ...data,
+    sections: (data as any).resume_sections,
+    resume_sections: undefined
+  } as unknown as Resume;
 }
 
 export async function createResume(
@@ -83,9 +101,14 @@ export async function createResume(
 
   if (error) throw new Error(error.message);
 
+  const newResume: Resume = {
+    ...resume,
+    sections: [],
+  } as unknown as Resume;
+
   // Create default personal info
   await supabase.from("personal_info").insert({
-    resume_id: resume.id,
+    resume_id: (resume as any).id,
     full_name: "",
     email: "",
   });
@@ -99,10 +122,11 @@ export async function createResume(
   ];
 
   await supabase.from("resume_sections").insert(
-    defaultSections.map((s) => ({ ...s, resume_id: resume.id }))
+    defaultSections.map((s) => ({ ...s, resume_id: (resume as any).id }))
   );
 
-  return resume;
+  // We just return the created resume base shell
+  return newResume;
 }
 
 export async function updateResume(
@@ -117,7 +141,7 @@ export async function updateResume(
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return data as unknown as Resume;
 }
 
 export async function deleteResume(id: string): Promise<void> {
@@ -138,7 +162,7 @@ export async function duplicateResume(resumeId: string, userId: string): Promise
   }
 
   // Copy sections and items
-  if (original.sections) {
+  if (original.sections && original.sections.length > 0) {
     for (const section of original.sections) {
       const { data: newSection } = await supabase
         .from("resume_sections")
@@ -155,9 +179,9 @@ export async function duplicateResume(resumeId: string, userId: string): Promise
       if (newSection && section.items) {
         for (const item of section.items) {
           await supabase.from("section_items").insert({
-            section_id: newSection.id,
+            section_id: (newSection as any).id,
             position: item.position,
-            data: item.data,
+            data: item.data as any,
           });
         }
       }
@@ -177,12 +201,12 @@ export async function updatePersonalInfo(
 ): Promise<PersonalInfo> {
   const { data: result, error } = await supabase
     .from("personal_info")
-    .upsert({ ...data, resume_id: resumeId }, { onConflict: "resume_id" })
+    .upsert({ ...data, resume_id: resumeId } as any, { onConflict: "resume_id" })
     .select()
     .single();
 
   if (error) throw new Error(error.message);
-  return result;
+  return result as unknown as PersonalInfo;
 }
 
 // ============================================================
@@ -212,7 +236,7 @@ export async function addSection(
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return data as unknown as ResumeSection;
 }
 
 export async function updateSection(
@@ -247,7 +271,7 @@ export async function addSectionItem(sectionId: string, data: object): Promise<v
   const { error } = await supabase.from("section_items").insert({
     section_id: sectionId,
     position: nextPosition,
-    data,
+    data: data as any,
   });
 
   if (error) throw new Error(error.message);
@@ -256,7 +280,7 @@ export async function addSectionItem(sectionId: string, data: object): Promise<v
 export async function updateSectionItem(itemId: string, data: object): Promise<void> {
   const { error } = await supabase
     .from("section_items")
-    .update({ data })
+    .update({ data: data as any })
     .eq("id", itemId);
 
   if (error) throw new Error(error.message);
