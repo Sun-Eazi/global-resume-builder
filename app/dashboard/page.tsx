@@ -27,7 +27,7 @@ function ResumeCard({
   };
 
   return (
-    <div className="group relative glass rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1">
+    <div className="group relative feature-card overflow-hidden transition-all duration-300 hover:-translate-y-1" style={{ padding: 0 }}>
       {/* Thumbnail */}
       <div
         className={`h-40 bg-gradient-to-br ${templateColors[resume.template_id] || templateColors.modern} relative overflow-hidden`}
@@ -205,52 +205,36 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0E1A]">
+    <div id="page-dashboard" className="page active" style={{ display: "block", minHeight: "100vh" }}>
       {/* Top Nav */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between backdrop-blur-sm sticky top-0 z-10 bg-[#0B0E1A]/90">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-xs">G</div>
-          <span className="font-semibold text-white text-sm" style={{ fontFamily: "Syne, sans-serif" }}>{brand.appName}</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-400 hidden md:block">
-            {profile?.full_name || user.email}
-          </span>
-          <button
-            onClick={signOut}
-            className="text-xs text-gray-500 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
-          >
-            Sign Out
-          </button>
+      <nav className="custom-nav" style={{ position: "relative", zIndex: 10 }}>
+        <div className="nav-inner" style={{ maxWidth: "1280px" }}>
+          <Link href="/" className="logo">
+            <div className="logo-icon">GRB</div>
+            <span className="logo-name">{brand.appName}</span>
+          </Link>
+          <div className="nav-btns">
+            <span className="text-sm text-gray-400 hidden md:inline-block mr-4">
+              {profile?.full_name || user.email}
+            </span>
+            <button onClick={signOut} className="cv-btn cv-btn-ghost" style={{ padding: "8px 16px", fontSize: "13px" }}>
+              Sign Out
+            </button>
+          </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      <main className="max-w-7xl mx-auto px-6 py-10 pt-16">
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ fontFamily: "Syne, sans-serif" }}>
-              My Resumes
+            <h1 className="text-3xl font-bold text-white tracking-tight" style={{ fontFamily: "var(--font-syne), sans-serif" }}>
+              Welcome back, {profile?.full_name?.split(" ")[0] || "there"}
             </h1>
             <p className="text-gray-400 mt-1">{resumes.length} resume{resumes.length !== 1 ? "s" : ""}</p>
           </div>
-          <button onClick={handleCreate} disabled={isCreating} className="btn-primary">
-            {isCreating ? (
-              <>
-                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Creating...
-              </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                New Resume
-              </>
-            )}
+          <button onClick={handleCreate} disabled={isCreating} className="cv-btn cv-btn-primary">
+            {isCreating ? "Creating..." : "New Resume →"}
           </button>
         </div>
 
@@ -258,7 +242,7 @@ export default function DashboardPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="glass rounded-2xl overflow-hidden border border-white/10">
+              <div key={i} className="feature-card overflow-hidden" style={{ padding: 0 }}>
                 <div className="h-40 skeleton" />
                 <div className="p-4 space-y-2">
                   <div className="h-3 skeleton rounded w-3/4" />
@@ -276,7 +260,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-2" style={{ fontFamily: "Syne, sans-serif" }}>No resumes yet</h3>
             <p className="text-gray-500 mb-8">Create your first resume to get started</p>
-            <button onClick={handleCreate} className="btn-primary">
+            <button onClick={handleCreate} className="cv-btn cv-btn-primary flex items-center gap-2 mx-auto">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -296,7 +280,7 @@ export default function DashboardPage() {
             {/* Create new card */}
             <button
               onClick={handleCreate}
-              className="glass rounded-2xl border border-dashed border-white/10 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 min-h-[200px] flex flex-col items-center justify-center gap-3 text-gray-500 hover:text-blue-400"
+              className="feature-card border border-dashed border-white/10 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all duration-300 min-h-[200px] flex flex-col items-center justify-center gap-3 text-gray-500 hover:text-blue-400"
             >
               <div className="w-10 h-10 rounded-xl border border-current flex items-center justify-center">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

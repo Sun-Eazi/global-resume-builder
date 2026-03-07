@@ -1,4 +1,4 @@
-import type { Resume, ExperienceItem, EducationItem, SkillsItem, ProjectItem } from "@/types";
+import type { Resume, ExperienceItem, EducationItem, SkillsItem, ProjectItem, LanguageItem, CertificationItem } from "@/types";
 import { formatDateRange } from "@/utils/sanitize";
 
 export default function ModernTemplate({ resume }: { resume: Resume }) {
@@ -14,185 +14,174 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
   const certificationsSection = getSection("certifications");
   const languagesSection = getSection("languages");
 
+  const initials = pi?.full_name
+    ? pi.full_name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+    : "Me";
+
   return (
-    <div className="w-full min-h-full font-sans text-gray-900" style={{ fontFamily: "DM Sans, sans-serif" }}>
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-10 py-8 text-white">
-        <h1 className="text-4xl font-bold tracking-tight">{pi?.full_name || "Your Name"}</h1>
-        {pi?.job_title && (
-          <p className="text-blue-200 mt-1 text-lg">{pi.job_title}</p>
-        )}
-        <div className="flex flex-wrap gap-4 mt-4 text-sm text-blue-100">
-          {pi?.email && (
-            <span className="flex items-center gap-1.5">
-              <span>✉</span> {pi.email}
-            </span>
-          )}
-          {pi?.phone && (
-            <span className="flex items-center gap-1.5">
-              <span>📞</span> {pi.phone}
-            </span>
-          )}
-          {pi?.location && (
-            <span className="flex items-center gap-1.5">
-              <span>📍</span> {pi.location}
-            </span>
-          )}
-          {pi?.website && (
-            <span className="flex items-center gap-1.5">
-              <span>🌐</span> {pi.website}
-            </span>
-          )}
-          {pi?.linkedin && (
-            <span className="flex items-center gap-1.5">
-              <span>in</span> {pi.linkedin}
-            </span>
-          )}
-          {pi?.github && (
-            <span className="flex items-center gap-1.5">
-              <span>⌥</span> {pi.github}
-            </span>
-          )}
+    <div id="tmpl-modern" className="w-full h-full bg-white text-gray-900" style={{ display: "block" }}>
+      <div className="resume-card" style={{ boxShadow: "none", border: "none", borderRadius: 0 }}>
+        <div className="resume-modern-header">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div className="resume-name">{pi?.full_name || "Your Name"}</div>
+              <div className="resume-role">{pi?.job_title || "Professional Title"}</div>
+              <div className="resume-contact">
+                {pi?.email && <span>✉ {pi.email}</span>}
+                {pi?.phone && <span>☎ {pi.phone}</span>}
+                {pi?.location && <span>⊙ {pi.location}</span>}
+                {pi?.linkedin && <span>in {pi.linkedin}</span>}
+                {pi?.website && <span>🌐 {pi.website}</span>}
+                {pi?.github && <span>⌥ {pi.github}</span>}
+              </div>
+            </div>
+            <div style={{
+              width: "54px", height: "54px", borderRadius: "50%",
+              background: "linear-gradient(135deg,#0A84FF,#70BFFF)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "white", fontFamily: "var(--font-syne), sans-serif",
+              fontWeight: 800, fontSize: "18px", border: "3px solid rgba(255,255,255,.2)"
+            }}>
+              {initials}
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="px-10 py-8 space-y-8">
-        {/* Summary */}
-        {pi?.summary && (
-          <section>
-            <h2 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-3 border-b-2 border-blue-600 pb-1">
-              Summary
-            </h2>
-            <p className="text-gray-700 text-sm leading-relaxed">{pi.summary}</p>
-          </section>
-        )}
+        <div className="resume-body">
+          <div className="resume-sidebar">
+            {/* Summary */}
+            {pi?.summary && (
+              <div style={{ marginBottom: "18px" }}>
+                <div className="r-section-title">Summary</div>
+                <p style={{ fontSize: "10px", color: "#475569", lineHeight: 1.7 }}>
+                  {pi.summary}
+                </p>
+              </div>
+            )}
 
-        {/* Experience */}
-        {experienceSection && experienceSection.items.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4 border-b-2 border-blue-600 pb-1">
-              {experienceSection.title}
-            </h2>
-            <div className="space-y-5">
-              {experienceSection.items.map((item) => {
-                const data = item.data as ExperienceItem;
-                return (
-                  <div key={item.id}>
-                    <div className="flex justify-between items-start">
+            {/* Skills */}
+            {skillsSection && skillsSection.items.length > 0 && (
+              <div style={{ marginBottom: "16px" }}>
+                <div className="r-section-title">{skillsSection.title}</div>
+                <div>
+                  {skillsSection.items.map((item) => {
+                    const data = item.data as SkillsItem;
+                    return <span key={item.id} className="r-skill-tag">{data.name}</span>;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Languages */}
+            {languagesSection && languagesSection.items.length > 0 && (
+              <div style={{ marginBottom: "16px" }}>
+                <div className="r-section-title">{languagesSection.title}</div>
+                {languagesSection.items.map((item) => {
+                  const data = item.data as LanguageItem;
+                  return (
+                    <div key={item.id} style={{ fontSize: "10px", color: "#1E293B", marginBottom: "4px" }}>
+                      <strong>{data.name}</strong> <span style={{ color: "#64748B" }}>{data.proficiency?.replace(/_/g, " ")}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Certifications */}
+            {certificationsSection && certificationsSection.items.length > 0 && (
+              <div>
+                <div className="r-section-title">{certificationsSection.title}</div>
+                {certificationsSection.items.map((item) => {
+                  const data = item.data as CertificationItem;
+                  return (
+                    <div key={item.id} style={{ marginBottom: "8px" }}>
+                      <div style={{ fontSize: "10px", color: "#1E293B", fontWeight: 600 }}>{data.name}</div>
+                      <div style={{ fontSize: "9px", color: "#64748B" }}>{data.issuer}{data.date ? ` · ${data.date}` : ""}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="resume-main">
+            {/* Work Experience */}
+            {experienceSection && experienceSection.items.length > 0 && (
+              <div className="r-main-section">
+                <div className="r-main-title">{experienceSection.title}</div>
+                {experienceSection.items.map((item) => {
+                  const data = item.data as ExperienceItem;
+                  return (
+                    <div className="r-job" key={item.id}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div><div className="r-job-title">{data.position}</div><div className="r-job-company">{data.company}</div></div>
+                        <div style={{ textAlign: "right", minWidth: "100px" }}>
+                          <div className="r-job-date">{formatDateRange(data.start_date, data.end_date, data.is_current)}</div>
+                          {data.location && <div style={{ fontSize: "9px", color: "#94A3B8" }}>{data.location}</div>}
+                        </div>
+                      </div>
+                      {data.description && <div className="r-job-desc whitespace-pre-wrap">{data.description}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {(experienceSection?.items.length ?? 0) > 0 && <div className="r-divider"></div>}
+
+            {/* Education */}
+            {educationSection && educationSection.items.length > 0 && (
+              <div className="r-main-section">
+                <div className="r-main-title">{educationSection.title}</div>
+                {educationSection.items.map((item) => {
+                  const data = item.data as EducationItem;
+                  return (
+                    <div key={item.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{data.position}</h3>
-                        <div className="text-blue-600 text-sm font-medium">{data.company}</div>
+                        <div style={{ fontSize: "12px", fontWeight: 700, color: "#0F172A" }}>{data.degree}{data.field ? ` in ${data.field}` : ""}</div>
+                        <div style={{ fontSize: "11px", color: "#0A84FF", fontWeight: 500 }}>{data.institution}</div>
                       </div>
-                      <div className="text-right text-xs text-gray-500 shrink-0 ml-4">
-                        <div>{formatDateRange(data.start_date, data.end_date, data.is_current)}</div>
-                        {data.location && <div>{data.location}</div>}
-                      </div>
-                    </div>
-                    {data.description && (
-                      <p className="text-gray-600 text-sm mt-2 leading-relaxed">{data.description}</p>
-                    )}
-                    {data.highlights && data.highlights.length > 0 && (
-                      <ul className="mt-2 space-y-1">
-                        {data.highlights.map((h, i) => (
-                          <li key={i} className="text-gray-600 text-sm flex gap-2">
-                            <span className="text-blue-500 mt-0.5 shrink-0">▸</span>
-                            {h}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* Education */}
-        {educationSection && educationSection.items.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4 border-b-2 border-blue-600 pb-1">
-              {educationSection.title}
-            </h2>
-            <div className="space-y-4">
-              {educationSection.items.map((item) => {
-                const data = item.data as EducationItem;
-                return (
-                  <div key={item.id} className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{data.institution}</h3>
-                      <div className="text-sm text-gray-600">
-                        {data.degree}{data.field ? `, ${data.field}` : ""}
-                        {data.gpa ? ` — GPA: ${data.gpa}` : ""}
+                      <div style={{ fontSize: "10px", color: "#64748B", textAlign: "right", minWidth: "100px" }}>
+                        {formatDateRange(data.start_date, data.end_date)}
+                        {data.gpa && <><br />GPA {data.gpa}</>}
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500 shrink-0 ml-4">
-                      {formatDateRange(data.start_date, data.end_date)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                  );
+                })}
+              </div>
+            )}
 
-        {/* Skills */}
-        {skillsSection && skillsSection.items.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4 border-b-2 border-blue-600 pb-1">
-              {skillsSection.title}
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {skillsSection.items.map((item) => {
-                const data = item.data as SkillsItem;
-                return (
-                  <span
-                    key={item.id}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full border border-blue-200"
-                  >
-                    {data.name}
-                  </span>
-                );
-              })}
-            </div>
-          </section>
-        )}
+            {(educationSection?.items.length ?? 0) > 0 && projectsSection && projectsSection.items.length > 0 && <div className="r-divider"></div>}
 
-        {/* Projects */}
-        {projectsSection && projectsSection.items.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-4 border-b-2 border-blue-600 pb-1">
-              {projectsSection.title}
-            </h2>
-            <div className="space-y-4">
-              {projectsSection.items.map((item) => {
-                const data = item.data as ProjectItem;
-                return (
-                  <div key={item.id}>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900">{data.name}</h3>
-                      {data.url && (
-                        <span className="text-blue-500 text-xs">{data.url}</span>
+            {/* Projects */}
+            {projectsSection && projectsSection.items.length > 0 && (
+              <div className="r-main-section">
+                <div className="r-main-title">{projectsSection.title}</div>
+                {projectsSection.items.map((item) => {
+                  const data = item.data as ProjectItem;
+                  return (
+                    <div className="r-job" key={item.id}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div><div className="r-job-title">{data.name}</div></div>
+                        <div style={{ textAlign: "right" }}>
+                          {data.url && <div className="r-job-date lowercase" style={{ textTransform: 'lowercase' }}>{data.url}</div>}
+                        </div>
+                      </div>
+                      {data.description && <div className="r-job-desc whitespace-pre-wrap">{data.description}</div>}
+                      {data.technologies && data.technologies.length > 0 && (
+                        <div style={{ marginTop: "4px" }}>
+                          {data.technologies.map((tech, i) => (
+                            <span key={i} className="r-skill-tag inline-block mr-1 mb-1">{tech}</span>
+                          ))}
+                        </div>
                       )}
                     </div>
-                    {data.description && (
-                      <p className="text-gray-600 text-sm mt-1">{data.description}</p>
-                    )}
-                    {data.technologies && data.technologies.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {data.technologies.map((tech, i) => (
-                          <span key={i} className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

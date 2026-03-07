@@ -47,21 +47,21 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div className="glass rounded-2xl p-8 shadow-2xl">
+        <div style={{ background: "rgba(22,27,34,0.7)", border: "1px solid var(--border)", borderRadius: "24px", padding: "40px", position: "relative", overflow: "hidden" }}>
           {error && (
             <div className="mb-5 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 text-left">
             <div>
-              <label className="label">Email address</label>
+              <label className="form-label">Email address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input"
+                className="form-input"
                 placeholder="you@example.com"
                 required
                 autoComplete="email"
@@ -70,7 +70,7 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="label" style={{ marginBottom: 0 }}>Password</label>
+                <label className="form-label" style={{ marginBottom: 0 }}>Password</label>
                 <Link href="/auth/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
                   Forgot password?
                 </Link>
@@ -79,14 +79,14 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input"
+                className="form-input"
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
               />
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary w-full mt-2">
+            <button type="submit" disabled={isLoading} className="cv-btn cv-btn-primary w-full mt-2" style={{ padding: "12px", fontSize: "14px" }}>
               {isLoading ? (
                 <>
                   <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">

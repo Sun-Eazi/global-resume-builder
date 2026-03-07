@@ -10,7 +10,7 @@ const SECTION_TYPES: { type: SectionType; label: string; icon: string }[] = [
   { type: "skills", label: "Skills", icon: "⚡" },
   { type: "projects", label: "Projects", icon: "🚀" },
   { type: "certifications", label: "Certifications", icon: "📜" },
-  { type: "languages", label: "Languages", icon: "🌍" },
+  { type: "languages", label: "Languages", icon: "🌐" },
   { type: "custom", label: "Custom Section", icon: "✦" },
 ];
 
@@ -94,33 +94,37 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
     setIsGenerating(false);
   };
 
+  const getSectionIcon = (type: string) => {
+    return SECTION_TYPES.find(t => t.type === type)?.icon || "📄";
+  };
+
   return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Sections</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Manage your resume sections</p>
-        </div>
-        <div className="relative">
+    <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <p style={{ fontSize: "11px", color: "var(--muted)", margin: 0, fontFamily: "var(--font-syne), sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em" }}>Sections</p>
+
+        <div style={{ position: "relative" }}>
           <button
             onClick={() => setShowAddMenu(!showAddMenu)}
             disabled={isAdding}
-            className="btn-primary text-xs px-3 py-2 gap-1.5"
+            style={{ fontSize: "11px", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Add Section
+            + Add Section
           </button>
           {showAddMenu && (
             <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowAddMenu(false)} />
-              <div className="absolute right-0 top-full mt-2 z-20 bg-[#1F2937] border border-white/10 rounded-xl shadow-2xl overflow-hidden w-52">
+              <div
+                style={{ position: "fixed", inset: 0, zIndex: 10 }}
+                onClick={() => setShowAddMenu(false)}
+              />
+              <div style={{ position: "absolute", right: 0, top: "100%", marginTop: "8px", zIndex: 20, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "10px", width: "160px", padding: "4px" }}>
                 {SECTION_TYPES.map((s) => (
                   <button
                     key={s.type}
                     onClick={() => handleAddSection(s.type, s.label)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors"
+                    style={{ width: "100%", display: "flex", alignItems: "center", gap: "8px", padding: "8px", fontSize: "11px", color: "var(--text)", background: "none", border: "none", cursor: "pointer", textAlign: "left", borderRadius: "6px" }}
+                    onMouseOver={(e) => e.currentTarget.style.background = "var(--bg)"}
+                    onMouseOut={(e) => e.currentTarget.style.background = "none"}
                   >
                     <span>{s.icon}</span>
                     {s.label}
@@ -133,87 +137,88 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
       </div>
 
       {sections.length === 0 ? (
-        <div className="text-center py-12 text-gray-600">
-          <p className="text-sm">No sections yet. Add one to get started.</p>
+        <div style={{ textAlign: "center", padding: "40px 0", color: "var(--muted)", fontSize: "12px" }}>
+          No sections yet. Add one to get started.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div>
           {sections.sort((a, b) => a.position - b.position).map((section) => (
-            <div key={section.id} className={`glass rounded-xl border transition-all ${expandedSection === section.id ? "border-blue-500/20" : "border-white/5"}`}>
-              {/* Section header */}
+            <div key={section.id} className="section-item">
               <div
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer"
+                className="section-item-header"
                 onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
               >
-                <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform shrink-0 ${expandedSection === section.id ? "rotate-90" : ""}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-
-                <span className="text-sm text-white font-medium flex-1">{section.title}</span>
-                <span className="text-xs text-gray-500">{section.items?.length || 0} items</span>
-
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleToggleVisibility(section); }}
-                  className={`text-xs px-2 py-1 rounded-md transition-colors ${section.is_visible ? "text-green-400 bg-green-500/10" : "text-gray-500 bg-white/5"}`}
-                >
-                  {section.is_visible ? "Visible" : "Hidden"}
-                </button>
-
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDeleteSection(section.id); }}
-                  className="text-gray-600 hover:text-red-400 transition-colors p-1"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span className="section-item-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span>{getSectionIcon(section.type)}</span>
+                    <span style={{ textDecoration: !section.is_visible ? "line-through" : "none", opacity: !section.is_visible ? 0.6 : 1 }}>
+                      {section.title} ({section.items?.length || 0})
+                    </span>
+                  </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleToggleVisibility(section); }}
+                    style={{ background: "none", border: "none", color: "var(--muted)", fontSize: "11px", cursor: "pointer" }}
+                    title="Toggle Visibility"
+                  >
+                    {section.is_visible ? "👁️" : "🗑️"}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDeleteSection(section.id); }}
+                    style={{ background: "none", border: "none", color: "var(--accent)", fontSize: "11px", cursor: "pointer" }}
+                    title="Delete Section"
+                  >
+                    ✕
+                  </button>
+                  <span style={{ color: "var(--muted)", fontSize: "11px", marginLeft: "4px" }}>
+                    {expandedSection === section.id ? "▼" : "▶"}
+                  </span>
+                </div>
               </div>
 
-              {/* Expanded content */}
               {expandedSection === section.id && (
-                <div className="border-t border-white/5 p-4 space-y-3">
+                <div className="section-collapse">
                   {section.items?.map((item) => (
-                    <div key={item.id} className="bg-white/[0.03] rounded-xl p-3 border border-white/5 space-y-3">
+                    <div key={item.id} style={{ marginBottom: "12px" }}>
                       {editingItem?.id === item.id ? (
-                        <div className="space-y-3">
+                        <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "8px", padding: "12px" }}>
                           {section.type === "experience" && (
                             <>
-                              <div className="grid grid-cols-2 gap-3">
+                              <div className="form-grid" style={{ marginBottom: "8px" }}>
                                 <div>
-                                  <label className="label text-[10px]">Position</label>
+                                  <label className="form-label">Position</label>
                                   <input
-                                    className="input text-xs p-2"
+                                    className="form-input"
                                     value={editingItem.data.position || ""}
                                     onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, position: e.target.value } })}
                                     placeholder="Software Engineer"
                                   />
                                 </div>
                                 <div>
-                                  <label className="label text-[10px]">Company</label>
+                                  <label className="form-label">Company</label>
                                   <input
-                                    className="input text-xs p-2"
+                                    className="form-input"
                                     value={editingItem.data.company || ""}
                                     onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, company: e.target.value } })}
                                     placeholder="Google"
                                   />
                                 </div>
                               </div>
-                              <div>
-                                <div className="flex justify-between items-center mb-1">
-                                  <label className="label text-[10px] m-0">Description / Bullets</label>
+                              <div style={{ marginBottom: "12px" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                                  <label className="form-label" style={{ marginBottom: 0 }}>Description / Bullets</label>
                                   <button
                                     onClick={() => handleGenerateExperience(editingItem.data.company || "a company", editingItem.data.position || "a position")}
                                     disabled={isGenerating}
-                                    className="text-[10px] text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                                    style={{ background: "none", border: "none", color: "var(--primary)", fontSize: "10px", cursor: "pointer" }}
                                   >
-                                    {isGenerating ? "Generating..." : "✨ Generate with AI"}
+                                    {isGenerating ? "Generating..." : "✨ AI Generate"}
                                   </button>
                                 </div>
                                 <textarea
-                                  className="input text-xs p-2 h-24"
+                                  className="form-input form-textarea"
+                                  rows={4}
                                   value={editingItem.data.description || ""}
                                   onChange={e => setEditingItem({ ...editingItem, data: { ...editingItem.data, description: e.target.value } })}
                                   placeholder="• Built amazing things..."
@@ -222,50 +227,67 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
                             </>
                           )}
                           {section.type !== "experience" && (
-                            <div className="text-xs text-gray-400 italic">Editing for {section.type} is simplified in this view.</div>
+                            <div style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "12px", fontStyle: "italic" }}>
+                              Simplified editing in this view for {section.type}. (A full implementation would have targeted inputs).
+                            </div>
                           )}
-                          <div className="flex gap-2 justify-end">
-                            <button onClick={() => setEditingItem(null)} className="text-xs text-gray-400 hover:text-white px-2 py-1">Cancel</button>
-                            <button onClick={handleSaveItem} className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded">Save</button>
+
+                          <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                            <button
+                              onClick={() => setEditingItem(null)}
+                              style={{ background: "none", border: "1px solid var(--border)", borderRadius: "6px", color: "var(--text)", padding: "4px 12px", fontSize: "11px", cursor: "pointer" }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={handleSaveItem}
+                              style={{ background: "var(--primary)", border: "none", borderRadius: "6px", color: "white", padding: "4px 12px", fontSize: "11px", cursor: "pointer", fontWeight: 600 }}
+                            >
+                              Save
+                            </button>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 text-xs text-gray-300">
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", background: "var(--surface)", borderRadius: "7px", padding: "8px 10px", fontSize: "11px", color: "var(--text)" }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             {section.type === "experience" ? (
-                              <div className="font-medium">
-                                {(item.data as any).position || "New Position"} at {(item.data as any).company || "Company"}
-                                {((item.data as any).description) && <div className="text-gray-500 font-normal mt-1 truncate">{(item.data as any).description}</div>}
-                              </div>
+                              <>
+                                <div style={{ fontWeight: 600, color: "white", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                  {(item.data as any).position || "New Position"} · <span style={{ color: "var(--muted)", fontWeight: 400 }}>{(item.data as any).company || "Company"}</span>
+                                </div>
+                                {((item.data as any).description) && <div style={{ color: "var(--muted)", marginTop: "4px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{(item.data as any).description}</div>}
+                              </>
                             ) : (
-                              <span className="font-mono text-gray-500 truncate">{JSON.stringify(item.data).slice(0, 60)}...</span>
+                              <span style={{ fontFamily: "monospace", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block" }}>
+                                {JSON.stringify(item.data).slice(0, 60)}...
+                              </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button onClick={() => setEditingItem({ id: item.id, data: { ...item.data } })} className="text-gray-500 hover:text-blue-400 p-1">
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0, paddingLeft: "8px" }}>
+                            <button
+                              onClick={() => setEditingItem({ id: item.id, data: { ...item.data } })}
+                              style={{ background: "none", border: "none", color: "var(--primary)", fontSize: "10px", cursor: "pointer" }}
+                            >
+                              Edit
                             </button>
                             <button
                               onClick={() => handleDeleteItem(item.id)}
-                              className="text-gray-600 hover:text-red-400 transition-colors p-1"
+                              style={{ background: "none", border: "none", color: "var(--accent)", fontSize: "10px", cursor: "pointer" }}
                             >
-                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
+                              Del
                             </button>
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
+
                   <button
                     onClick={() => handleAddItem(section.id, section.type as SectionType)}
-                    className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-blue-400 border border-dashed border-white/10 hover:border-blue-500/30 rounded-xl transition-all"
+                    className="add-item-btn"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add Item
+                    + Add Item
                   </button>
                 </div>
               )}
@@ -273,6 +295,6 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

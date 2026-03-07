@@ -9,8 +9,10 @@ import PersonalInfoForm from "@/components/resume/PersonalInfoForm";
 import SectionsEditor from "@/components/resume/SectionsEditor";
 import TemplateSelector from "@/components/resume/TemplateSelector";
 import ResumePreviewPane from "@/components/resume/ResumePreviewPane";
+import brand from "@/config/brand";
+import Link from "next/link";
 
-type ActiveTab = "personal" | "sections" | "template" | "settings";
+type ActiveTab = "info" | "sections" | "template" | "settings";
 
 export default function BuilderPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,10 +23,15 @@ export default function BuilderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("personal");
-  const [showPreview, setShowPreview] = useState(false);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("info");
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
+  const [scale, setScale] = useState(62);
+
+  // AI Mock Feature
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiResult, setAiResult] = useState("");
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth/login");
@@ -58,8 +65,8 @@ export default function BuilderPage() {
         await updatePersonalInfo(resume.id, resume.personal_info);
       }
       setIsDirty(false);
-      setSaveMsg("Saved!");
-      setTimeout(() => setSaveMsg(""), 2000);
+      setSaveMsg("✓ Saved");
+      setTimeout(() => setSaveMsg(""), 2200);
     } catch (err) {
       console.error(err);
     }
@@ -81,6 +88,7 @@ export default function BuilderPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
+      alert("In the full app, this triggers Puppeteer server-side to generate a pixel-perfect A4 PDF! Run the Next.js app to use real PDF export.");
     }
     setIsGeneratingPdf(false);
   };
@@ -90,156 +98,110 @@ export default function BuilderPage() {
     setIsDirty(true);
   };
 
+  const runAI = () => {
+    if (!aiPrompt.trim()) return;
+    setIsAiGenerating(true);
+    setAiResult("Generating…");
+    setTimeout(() => {
+      const AI_SAMPLES = [
+        "• Increased API response time by 42% through Redis caching and query optimization\n• Reduced infrastructure costs by $24K/year by migrating to containerized microservices\n• Led cross-functional team of 8 to deliver critical product feature 2 weeks ahead of schedule",
+        "• Architected real-time notification system handling 1M+ daily events with <50ms latency\n• Implemented CI/CD pipeline reducing deployment time from 4 hours to 12 minutes\n• Mentored 3 junior engineers, 2 of whom were promoted within 12 months",
+        "• Redesigned checkout flow, improving conversion rate by 23% and reducing cart abandonment\n• Built A/B testing framework used by 8 product teams across the organization\n• Achieved 99.98% uptime for payment processing system serving $2B+ in annual transactions"
+      ];
+      setAiResult(AI_SAMPLES[Math.floor(Math.random() * AI_SAMPLES.length)]);
+      setIsAiGenerating(false);
+    }, 1400);
+  };
+
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#0B0E1A] flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#0D1117] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#0A84FF] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!resume) return null;
 
-  const tabs: { id: ActiveTab; label: string; icon: string }[] = [
-    { id: "personal", label: "Personal Info", icon: "👤" },
-    { id: "sections", label: "Sections", icon: "📄" },
-    { id: "template", label: "Template", icon: "🎨" },
-    { id: "settings", label: "Settings", icon: "⚙️" },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#0B0E1A] flex flex-col">
-      {/* Top bar */}
-      <header className="border-b border-white/5 px-4 md:px-6 py-3 flex items-center gap-4 bg-[#0B0E1A]/95 backdrop-blur-sm sticky top-0 z-20">
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="text-gray-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <input
-          type="text"
-          value={resume.title}
-          onChange={(e) => updateResumeLocally({ title: e.target.value })}
-          className="flex-1 bg-transparent text-white font-medium text-sm outline-none border-b border-transparent focus:border-white/20 pb-0.5 max-w-xs"
-        />
-
-        <div className="ml-auto flex items-center gap-2">
-          {saveMsg && <span className="text-xs text-green-400">{saveMsg}</span>}
-          {isDirty && <span className="text-xs text-yellow-400">Unsaved</span>}
-
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className={`hidden md:flex btn-ghost text-xs px-3 py-1.5 gap-1.5 ${showPreview ? "border-blue-500/30 text-blue-400" : ""}`}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            Preview
-          </button>
-
-          <button onClick={handleSave} disabled={isSaving || !isDirty} className="btn-primary text-xs px-3 py-1.5">
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-
-          <button
-            onClick={handleDownloadPdf}
-            disabled={isGeneratingPdf}
-            className="btn-ghost text-xs px-3 py-1.5 gap-1.5"
-          >
-            {isGeneratingPdf ? (
-              <>
-                <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Generating...
-              </>
-            ) : (
-              <>
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                PDF
-              </>
-            )}
-          </button>
-        </div>
-      </header>
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-white/5 flex flex-col bg-[#0D1120] shrink-0 overflow-y-auto hidden md:flex">
-          <nav className="p-3 space-y-1">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? "bg-blue-600/15 text-blue-400 border border-blue-500/20"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <span className="text-base">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-
-          {/* Public toggle */}
-          <div className="mt-auto p-4 border-t border-white/5">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs font-medium text-gray-400">Public Link</div>
-                <div className="text-xs text-gray-600 mt-0.5">Share your resume</div>
-              </div>
-              <button
-                onClick={() => updateResumeLocally({ is_public: !resume.is_public })}
-                className={`relative w-10 h-5.5 rounded-full transition-colors ${
-                  resume.is_public ? "bg-blue-600" : "bg-white/10"
-                }`}
-                style={{ height: "22px" }}
-              >
-                <span
-                  className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                    resume.is_public ? "translate-x-[18px]" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-            {resume.is_public && (
-              <div className="mt-3 flex items-center gap-2 bg-white/5 rounded-lg px-3 py-2">
-                <span className="text-xs text-gray-400 truncate flex-1">
-                  /resume/{resume.slug}
-                </span>
-                <button
-                  onClick={() => navigator.clipboard.writeText(`${window.location.origin}/resume/${resume.slug}`)}
-                  className="text-gray-500 hover:text-white transition-colors shrink-0"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-              </div>
-            )}
+    <div id="page-builder" className="page active flex flex-col min-h-screen">
+      <nav style={{ position: "relative", backdropFilter: "none", zIndex: 10 }}>
+        <div className="nav-inner" style={{ maxWidth: "100%" }}>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="text-gray-400 hover:text-white transition-colors"
+              title="Back to Dashboard"
+            >
+              <svg className="w-5 h-5 flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <input
+              type="text"
+              value={resume.title}
+              onChange={(e) => updateResumeLocally({ title: e.target.value })}
+              title="Resume Title"
+              className="bg-transparent text-white font-medium text-sm outline-none border-b border-transparent focus:border-white/20 max-w-xs"
+            />
           </div>
-        </aside>
 
-        {/* Main editor area */}
-        <main className={`flex-1 overflow-y-auto ${showPreview ? "hidden md:block md:max-w-[45%]" : ""}`}>
-          <div className="max-w-2xl mx-auto p-6">
-            {activeTab === "personal" && (
+          <div className="flex items-center gap-3">
+            {isDirty && <span className="text-xs text-[#FF6B35]">Unsaved</span>}
+            <button
+              onClick={handleSave}
+              disabled={isSaving || !isDirty}
+              className={`cv-btn ${saveMsg ? "cv-btn-ghost" : "cv-btn-primary"} cv-btn-sm ${saveMsg ? "!text-[#3FB950] border !border-[#3FB950]/30 !bg-[#3FB950]/10" : ""}`}
+            >
+              {isSaving ? "Saving..." : saveMsg || "Save Changes"}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="builder-layout" style={{ paddingTop: 0, flex: 1, height: "auto" }}>
+        {/* Sidebar */}
+        <aside className="builder-sidebar">
+          <div className="builder-tabs">
+            <button
+              className={`builder-tab ${activeTab === "info" ? "active" : ""}`}
+              onClick={() => setActiveTab("info")}
+              title="Personal Info"
+            >
+              👤
+            </button>
+            <button
+              className={`builder-tab ${activeTab === "sections" ? "active" : ""}`}
+              onClick={() => setActiveTab("sections")}
+              title="Sections"
+            >
+              📋
+            </button>
+            <button
+              className={`builder-tab ${activeTab === "template" ? "active" : ""}`}
+              onClick={() => setActiveTab("template")}
+              title="Template"
+            >
+              🎨
+            </button>
+            <button
+              className={`builder-tab ${activeTab === "settings" ? "active" : ""}`}
+              onClick={() => setActiveTab("settings")}
+              title="Settings"
+            >
+              ⚙
+            </button>
+          </div>
+
+          <div className="builder-tab-content">
+            {activeTab === "info" && (
               <PersonalInfoForm
                 resumeId={resume.id}
                 data={resume.personal_info}
                 onChange={(info) => updateResumeLocally({ personal_info: info })}
               />
             )}
+
             {activeTab === "sections" && (
               <SectionsEditor
                 resumeId={resume.id}
@@ -247,53 +209,112 @@ export default function BuilderPage() {
                 onRefresh={loadResume}
               />
             )}
+
             {activeTab === "template" && (
-              <TemplateSelector
-                selected={resume.template_id as TemplateId}
-                onChange={(t) => updateResumeLocally({ template_id: t })}
-              />
-            )}
-            {activeTab === "settings" && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white" style={{ fontFamily: "Syne, sans-serif" }}>Resume Settings</h2>
-                <div>
-                  <label className="label">Resume Title</label>
+              <div>
+                <p style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "14px", fontFamily: "var(--font-syne), sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em" }}>Choose Template</p>
+                <TemplateSelector
+                  selected={resume.template_id as TemplateId}
+                  onChange={(t) => updateResumeLocally({ template_id: t })}
+                />
+
+                <div style={{ marginTop: "20px" }}>
+                  <p style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "8px" }}>Preview Scale</p>
                   <input
-                    type="text"
-                    value={resume.title}
-                    onChange={(e) => updateResumeLocally({ title: e.target.value })}
-                    className="input"
+                    type="range"
+                    min="40"
+                    max="100"
+                    value={scale}
+                    onChange={(e) => setScale(Number(e.target.value))}
+                    style={{ width: "100%", accentColor: "var(--primary)" }}
                   />
                 </div>
-                <div>
-                  <label className="label">Visibility</label>
-                  <div className="glass rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                      <div className="text-sm text-white font-medium">Public Resume</div>
-                      <div className="text-xs text-gray-500 mt-0.5">Anyone with the link can view</div>
-                    </div>
-                    <button
-                      onClick={() => updateResumeLocally({ is_public: !resume.is_public })}
-                      className={`relative w-10 rounded-full transition-colors ${resume.is_public ? "bg-blue-600" : "bg-white/10"}`}
-                      style={{ height: "22px" }}
-                    >
-                      <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform ${resume.is_public ? "translate-x-[18px]" : ""}`} />
-                    </button>
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div>
+                <p style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "12px", fontFamily: "var(--font-syne), sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em" }}>Visibility</p>
+
+                <div className="toggle-row">
+                  <div>
+                    <div style={{ fontSize: "13px", color: "var(--text)" }}>Public Resume Link</div>
+                    <div style={{ fontSize: "11px", color: "var(--muted)", marginTop: "2px" }}>Anyone with link can view</div>
                   </div>
+                  <button
+                    className={`toggle ${resume.is_public ? "on" : ""}`}
+                    onClick={() => updateResumeLocally({ is_public: !resume.is_public })}
+                  />
+                </div>
+
+                {resume.is_public && (
+                  <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "8px", padding: "10px", marginBottom: "14px" }}>
+                    <div style={{ fontSize: "10px", color: "var(--muted)", marginBottom: "3px" }}>Your Public URL</div>
+                    <Link
+                      href={`/resume/${resume.slug}`}
+                      target="_blank"
+                      style={{ fontSize: "11px", color: "#58A6FF", textDecoration: "none" }}
+                    >
+                      {typeof window !== "undefined" ? window.location.origin : ""}/resume/{resume.slug}
+                    </Link>
+                  </div>
+                )}
+
+                <p style={{ fontSize: "11px", color: "var(--muted)", marginBottom: "12px", marginTop: "24px", fontFamily: "var(--font-syne), sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".08em" }}>🤖 AI Assistant</p>
+                <textarea
+                  className="form-input form-textarea"
+                  rows={3}
+                  placeholder="e.g. Write 3 bullet points for a React developer at a fintech startup with 3 years experience"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                />
+                <button
+                  onClick={runAI}
+                  disabled={isAiGenerating || !aiPrompt.trim()}
+                  style={{
+                    width: "100%", marginTop: "8px", padding: "9px",
+                    background: "rgba(255,107,53,.15)", border: "1px solid rgba(255,107,53,.3)",
+                    color: "#FF6B35", borderRadius: "8px", fontSize: "12px", cursor: "pointer",
+                    fontFamily: "var(--font-dm-sans), sans-serif", transition: "all .2s",
+                    opacity: isAiGenerating || !aiPrompt.trim() ? 0.5 : 1
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,107,53,.25)"}
+                  onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,107,53,.15)"}
+                >
+                  {isAiGenerating ? "Generating..." : "✨ Get AI Suggestion"}
+                </button>
+                {aiResult && (
+                  <div style={{ marginTop: "10px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "8px", padding: "10px", fontSize: "11px", color: "#C9D1D9", lineHeight: 1.7, whiteSpace: "pre-line" }}>
+                    {aiResult}
+                  </div>
+                )}
+
+                <div style={{ marginTop: "20px", paddingTop: "16px", borderTop: "1px solid var(--border)" }}>
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={isGeneratingPdf}
+                    style={{
+                      width: "100%", padding: "10px", background: "var(--primary)", color: "white",
+                      border: "none", borderRadius: "8px", fontSize: "13px", fontWeight: 600,
+                      cursor: "pointer", fontFamily: "var(--font-dm-sans), sans-serif", transition: "all .2s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = "#0060DF"}
+                    onMouseOut={(e) => e.currentTarget.style.background = "var(--primary)"}
+                  >
+                    {isGeneratingPdf ? "Generating PDF..." : "⬇ Download PDF"}
+                  </button>
                 </div>
               </div>
             )}
           </div>
-        </main>
+        </aside>
 
-        {/* Preview pane */}
-        {showPreview && (
-          <div className="hidden md:flex flex-1 border-l border-white/5 bg-gray-100 overflow-auto p-6 justify-center">
-            <div className="shadow-2xl" style={{ transform: "scale(0.85)", transformOrigin: "top center" }}>
-              <ResumePreviewPane resume={resume} />
-            </div>
+        {/* Preview */}
+        <main className="builder-preview" id="builder-preview-area">
+          <div className="preview-wrap" style={{ transform: `scale(${scale / 100})` }}>
+            <ResumePreviewPane resume={resume} />
           </div>
-        )}
+        </main>
       </div>
     </div>
   );
