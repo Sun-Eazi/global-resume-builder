@@ -16,6 +16,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
   },
+  global: {
+    fetch: (url, options) => {
+      return fetch(url, { ...options, cache: "no-store" });
+    },
+  },
 });
 
 // Server-side client (for API routes)

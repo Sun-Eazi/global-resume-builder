@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const dynamic = "force-dynamic";
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.GEMINI_API_KEY || process.env.Gemini_API_Key;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export async function POST(request: NextRequest) {
