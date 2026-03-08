@@ -27,6 +27,7 @@ export default function BuilderPage() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
   const [scale, setScale] = useState(62);
+  const [origin, setOrigin] = useState("");
 
   // AI Mock Feature
   const [aiPrompt, setAiPrompt] = useState("");
@@ -34,6 +35,9 @@ export default function BuilderPage() {
   const [isAiGenerating, setIsAiGenerating] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setOrigin(window.location.origin);
+    }
     if (!authLoading && !user) router.push("/auth/login");
   }, [user, authLoading, router]);
 
@@ -255,7 +259,7 @@ export default function BuilderPage() {
                       target="_blank"
                       style={{ fontSize: "11px", color: "#58A6FF", textDecoration: "none" }}
                     >
-                      {typeof window !== "undefined" ? window.location.origin : ""}/resume/{resume.slug}
+                      {origin ? `${origin}/resume/${resume.slug}` : `.../resume/${resume.slug}`}
                     </Link>
                   </div>
                 )}
