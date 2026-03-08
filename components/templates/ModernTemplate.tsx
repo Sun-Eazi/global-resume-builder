@@ -127,7 +127,7 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
               </div>
             )}
 
-            {(experienceSection?.items.length ?? 0) > 0 && <div className="r-divider"></div>}
+            {(experienceSection?.items?.length ?? 0) > 0 && <div className="r-divider"></div>}
 
             {/* Education */}
             {educationSection && (educationSection.items?.length || 0) > 0 && (
