@@ -167,7 +167,7 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
         </div>
       ) : (
         <div>
-          {sections.sort((a, b) => a.position - b.position).map((section) => (
+          {[...sections].sort((a, b) => a.position - b.position).map((section) => (
             <div key={section.id} className="section-item">
               <div
                 className="section-item-header"

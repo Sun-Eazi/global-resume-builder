@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getResumes, createResume, deleteResume, duplicateResume } from "@/lib/resume";
 import type { Resume } from "@/types";
 import brand from "@/config/brand";
+import ResumePreviewPane from "@/components/resume/ResumePreviewPane";
 
 function ResumeCard({
   resume,
@@ -28,33 +29,22 @@ function ResumeCard({
 
   return (
     <div className="group relative feature-card overflow-hidden transition-all duration-300 hover:-translate-y-1" style={{ padding: 0 }}>
-      {/* Thumbnail */}
+      {/* Thumbnail Preview */}
       <div
         onClick={() => router.push(`/builder/${resume.id}`)}
-        className={`h-40 cursor-pointer bg-gradient-to-br ${templateColors[resume.template_id] || templateColors.modern} relative overflow-hidden`}
+        className="h-[220px] cursor-pointer bg-white relative overflow-hidden flex items-start justify-center border-b border-gray-800"
       >
-        <div className="absolute inset-0 p-4">
-          <div className="bg-white/10 rounded-lg h-full p-3 space-y-2">
-            <div className="h-2.5 bg-white/30 rounded w-3/4" />
-            <div className="h-2 bg-white/20 rounded w-1/2" />
-            <div className="mt-3 space-y-1">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-1.5 bg-white/15 rounded" style={{ width: `${70 + Math.random() * 30}%` }} />
-              ))}
-            </div>
-          </div>
+        {/* Live Mini Map Render (Scaled Down) */}
+        <div style={{ width: "794px", height: "1123px", transform: "scale(0.22)", transformOrigin: "top center", pointerEvents: "none" }}>
+          <ResumePreviewPane resume={resume} />
         </div>
+
         {/* Actions overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push(`/builder/${resume.id}`);
-            }}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors"
-          >
+        <div className="absolute inset-0 bg-[#0D1117]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+          <span className="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-[0_0_20px_rgba(10,132,255,0.4)] border border-blue-500/50 flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
             Open Editor
-          </button>
+          </span>
         </div>
       </div>
 

@@ -83,7 +83,7 @@ export default function ProfessionalTemplate({ resume }: { resume: Resume }) {
                 return (
                   <div className="rp-item" key={item.id}>
                     <div className="rp-row">
-                      <div><span className="rp-job">{data.name}</span>{data.technologies && data.technologies.length > 0 && <span className="rp-co"> · {data.technologies.join(", ")}</span>}</div>
+                      <div><span className="rp-job">{data.name}</span>{data.technologies && <span className="rp-co"> · {Array.isArray(data.technologies) ? data.technologies.join(", ") : String(data.technologies)}</span>}</div>
                       {data.url && <div className="rp-date lowercase">{data.url}</div>}
                     </div>
                     {data.description && <div className="rp-desc whitespace-pre-wrap">{data.description}</div>}

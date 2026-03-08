@@ -86,7 +86,7 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
                   </div>
                   <div>
                     <div className="rm-title">{data.name}</div>
-                    <div className="rm-sub">{data.technologies?.join(", ")}</div>
+                    <div className="rm-sub">{data.technologies && (Array.isArray(data.technologies) ? data.technologies.join(", ") : String(data.technologies))}</div>
                     {data.description && <div className="rm-desc whitespace-pre-wrap">{data.description}</div>}
                   </div>
                 </div>

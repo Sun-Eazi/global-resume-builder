@@ -1151,6 +1151,12 @@ footer.custom-footer {
    ============================================================ */
 @media print {
 
+  /* Enforce background colors for templates */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   /* Hide builder UI elements */
   nav,
   .builder-sidebar,

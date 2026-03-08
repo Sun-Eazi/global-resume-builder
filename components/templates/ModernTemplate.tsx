@@ -168,11 +168,11 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
                         </div>
                       </div>
                       {data.description && <div className="r-job-desc whitespace-pre-wrap">{data.description}</div>}
-                      {data.technologies && data.technologies.length > 0 && (
+                      {data.technologies && (
                         <div style={{ marginTop: "4px" }}>
-                          {data.technologies.map((tech, i) => (
+                          {Array.isArray(data.technologies) ? data.technologies.map((tech, i) => (
                             <span key={i} className="r-skill-tag inline-block mr-1 mb-1">{tech}</span>
-                          ))}
+                          )) : <span className="r-skill-tag inline-block mr-1 mb-1">{String(data.technologies)}</span>}
                         </div>
                       )}
                     </div>
