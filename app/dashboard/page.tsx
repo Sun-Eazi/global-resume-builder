@@ -30,7 +30,8 @@ function ResumeCard({
     <div className="group relative feature-card overflow-hidden transition-all duration-300 hover:-translate-y-1" style={{ padding: 0 }}>
       {/* Thumbnail */}
       <div
-        className={`h-40 bg-gradient-to-br ${templateColors[resume.template_id] || templateColors.modern} relative overflow-hidden`}
+        onClick={() => router.push(`/builder/${resume.id}`)}
+        className={`h-40 cursor-pointer bg-gradient-to-br ${templateColors[resume.template_id] || templateColors.modern} relative overflow-hidden`}
       >
         <div className="absolute inset-0 p-4">
           <div className="bg-white/10 rounded-lg h-full p-3 space-y-2">
@@ -46,16 +47,13 @@ function ResumeCard({
         {/* Actions overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
           <button
-            onClick={() => router.push(`/builder/${resume.id}`)}
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push(`/builder/${resume.id}`);
+            }}
             className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors"
           >
-            Edit
-          </button>
-          <button
-            onClick={() => router.push(`/resume/preview/${resume.id}`)}
-            className="bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors border border-white/20"
-          >
-            Preview
+            Open Editor
           </button>
         </div>
       </div>
