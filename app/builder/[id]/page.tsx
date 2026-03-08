@@ -77,24 +77,20 @@ export default function BuilderPage() {
     setIsSaving(false);
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadPdf = () => {
     if (!resume) return;
     setIsGeneratingPdf(true);
-    try {
-      const res = await fetch(`/api/pdf/${resume.id}`);
-      if (!res.ok) throw new Error("PDF generation failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${resume.title.replace(/\s+/g, "-").toLowerCase()}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
-      alert("In the full app, this triggers Puppeteer server-side to generate a pixel-perfect A4 PDF! Run the Next.js app to use real PDF export.");
-    }
-    setIsGeneratingPdf(false);
+
+    // Temporarily rename the document title so the browser saves the PDF with a nice name
+    const originalTitle = document.title;
+    document.title = `${resume.title.replace(/\s+/g, "_").toLowerCase()}_resume`;
+
+    // Slight delay to allow UI to react before freezing the main thread for printing
+    setTimeout(() => {
+      window.print();
+      document.title = originalTitle;
+      setIsGeneratingPdf(false);
+    }, 150);
   };
 
   const updateResumeLocally = (updates: Partial<Resume>) => {

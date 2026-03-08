@@ -28,22 +28,35 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleAddSection = async (type: SectionType, label: string) => {
-    setIsAdding(true);
-    setShowAddMenu(false);
-    await addSection(resumeId, type, label);
-    onRefresh();
-    setIsAdding(false);
+    try {
+      setIsAdding(true);
+      setShowAddMenu(false);
+      await addSection(resumeId, type, label);
+      onRefresh();
+    } catch (err: any) {
+      alert("Error adding section: " + err.message);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const handleDeleteSection = async (sectionId: string) => {
     if (!confirm("Delete this section?")) return;
-    await deleteSection(sectionId);
-    onRefresh();
+    try {
+      await deleteSection(sectionId);
+      onRefresh();
+    } catch (err: any) {
+      alert("Error deleting section: " + err.message);
+    }
   };
 
   const handleToggleVisibility = async (section: ResumeSection) => {
-    await updateSection(section.id, { is_visible: !section.is_visible });
-    onRefresh();
+    try {
+      await updateSection(section.id, { is_visible: !section.is_visible });
+      onRefresh();
+    } catch (err: any) {
+      alert("Error updating visibility: " + err.message);
+    }
   };
 
   const handleAddItem = async (sectionId: string, type: SectionType) => {
@@ -56,20 +69,32 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
       languages: { name: "", proficiency: "professional_working" },
       custom: { title: "", description: "" },
     };
-    await addSectionItem(sectionId, defaultData[type]);
-    onRefresh();
+    try {
+      await addSectionItem(sectionId, defaultData[type]);
+      onRefresh();
+    } catch (err: any) {
+      alert("Error adding item: " + err.message);
+    }
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    await deleteSectionItem(itemId);
-    onRefresh();
+    try {
+      await deleteSectionItem(itemId);
+      onRefresh();
+    } catch (err: any) {
+      alert("Error deleting item: " + err.message);
+    }
   };
 
   const handleSaveItem = async () => {
     if (!editingItem) return;
-    await updateSectionItem(editingItem.id, editingItem.data);
-    setEditingItem(null);
-    onRefresh();
+    try {
+      await updateSectionItem(editingItem.id, editingItem.data);
+      setEditingItem(null);
+      onRefresh();
+    } catch (err: any) {
+      alert("Error saving item: " + err.message);
+    }
   };
 
   const handleGenerateExperience = async (company: string, position: string) => {
