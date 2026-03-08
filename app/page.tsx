@@ -305,8 +305,8 @@ export default function LandingPage() {
               &copy; {new Date().getFullYear()} Built by {brand.author}.
             </div>
             <div className="footer-links">
-              <a href="#" className="footer-link">Privacy</a>
-              <a href="#" className="footer-link">Terms</a>
+              <Link href="/privacy" className="footer-link">Privacy Policy</Link>
+              <Link href="/terms" className="footer-link">Terms of Service</Link>
               <a href={`mailto:${brand.supportEmail}`} className="footer-link">Support</a>
             </div>
           </div>
