@@ -3,7 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const dynamic = "force-dynamic";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const apiKey = process.env.GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export async function POST(request: NextRequest) {
     try {
@@ -11,6 +12,10 @@ export async function POST(request: NextRequest) {
 
         if (!prompt?.trim()) {
             return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
+        }
+
+        if (!genAI) {
+            return NextResponse.json({ error: "Gemini API key is missing. Please add GEMINI_API_KEY to your environment variables." }, { status: 500 });
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
