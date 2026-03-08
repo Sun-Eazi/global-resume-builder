@@ -139,7 +139,7 @@ function ResumeCard({
           </div>
         </div>
         <p className="text-xs text-gray-600 mt-2">
-          Updated {new Date(resume.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+          Updated {new Date(resume.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}
         </p>
       </div>
     </div>

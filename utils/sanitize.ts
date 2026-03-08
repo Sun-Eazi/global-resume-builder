@@ -81,8 +81,8 @@ export function sanitizeResumeData(data: Record<string, unknown>): Record<string
         typeof item === "object" && item !== null
           ? sanitizeResumeData(item as Record<string, unknown>)
           : typeof item === "string"
-          ? sanitizeText(item)
-          : item
+            ? sanitizeText(item)
+            : item
       );
     } else if (typeof value === "object" && value !== null) {
       sanitized[key] = sanitizeResumeData(value as Record<string, unknown>);
@@ -99,8 +99,13 @@ export function sanitizeResumeData(data: Record<string, unknown>): Record<string
 
 export function formatDate(dateString?: string): string {
   if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+  } catch {
+    return dateString;
+  }
 }
 
 export function formatDateRange(start?: string, end?: string, isCurrent?: boolean): string {
