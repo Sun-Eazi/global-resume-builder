@@ -110,8 +110,8 @@ export default function SectionsEditor({ resumeId, sections, onRefresh }: Sectio
         })
       });
       if (res.ok) {
-        const { text } = await res.json();
-        setEditingItem({ ...editingItem, data: { ...editingItem.data, description: text } });
+        const { suggestion } = await res.json();
+        setEditingItem({ ...editingItem, data: { ...editingItem.data, description: suggestion } });
       }
     } catch (e) {
       console.error(e);

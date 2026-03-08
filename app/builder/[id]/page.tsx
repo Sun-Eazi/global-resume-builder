@@ -98,19 +98,29 @@ export default function BuilderPage() {
     setIsDirty(true);
   };
 
-  const runAI = () => {
+  const runAI = async () => {
     if (!aiPrompt.trim()) return;
     setIsAiGenerating(true);
     setAiResult("Generating…");
-    setTimeout(() => {
-      const AI_SAMPLES = [
-        "• Increased API response time by 42% through Redis caching and query optimization\n• Reduced infrastructure costs by $24K/year by migrating to containerized microservices\n• Led cross-functional team of 8 to deliver critical product feature 2 weeks ahead of schedule",
-        "• Architected real-time notification system handling 1M+ daily events with <50ms latency\n• Implemented CI/CD pipeline reducing deployment time from 4 hours to 12 minutes\n• Mentored 3 junior engineers, 2 of whom were promoted within 12 months",
-        "• Redesigned checkout flow, improving conversion rate by 23% and reducing cart abandonment\n• Built A/B testing framework used by 8 product teams across the organization\n• Achieved 99.98% uptime for payment processing system serving $2B+ in annual transactions"
-      ];
-      setAiResult(AI_SAMPLES[Math.floor(Math.random() * AI_SAMPLES.length)]);
-      setIsAiGenerating(false);
-    }, 1400);
+    try {
+      const res = await fetch("/api/ai/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: aiPrompt,
+          context: { role: resume?.personal_info?.job_title, target: "General" }
+        })
+      });
+      if (res.ok) {
+        const { suggestion } = await res.json();
+        setAiResult(suggestion);
+      } else {
+        setAiResult("Error generating AI suggestion.");
+      }
+    } catch (e) {
+      setAiResult("Failed to connect to AI server.");
+    }
+    setIsAiGenerating(false);
   };
 
   if (authLoading || isLoading) {
