@@ -60,11 +60,11 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
             )}
 
             {/* Skills */}
-            {skillsSection && skillsSection.items.length > 0 && (
+            {skillsSection && (skillsSection.items?.length || 0) > 0 && (
               <div style={{ marginBottom: "16px" }}>
                 <div className="r-section-title">{skillsSection.title}</div>
                 <div>
-                  {skillsSection.items.map((item) => {
+                  {(skillsSection.items || []).map((item) => {
                     const data = item.data as SkillsItem;
                     return <span key={item.id} className="r-skill-tag">{data.name}</span>;
                   })}
@@ -73,10 +73,10 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
             )}
 
             {/* Languages */}
-            {languagesSection && languagesSection.items.length > 0 && (
+            {languagesSection && (languagesSection.items?.length || 0) > 0 && (
               <div style={{ marginBottom: "16px" }}>
                 <div className="r-section-title">{languagesSection.title}</div>
-                {languagesSection.items.map((item) => {
+                {(languagesSection.items || []).map((item) => {
                   const data = item.data as LanguageItem;
                   return (
                     <div key={item.id} style={{ fontSize: "10px", color: "#1E293B", marginBottom: "4px" }}>
@@ -88,10 +88,10 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
             )}
 
             {/* Certifications */}
-            {certificationsSection && certificationsSection.items.length > 0 && (
+            {certificationsSection && (certificationsSection.items?.length || 0) > 0 && (
               <div>
                 <div className="r-section-title">{certificationsSection.title}</div>
-                {certificationsSection.items.map((item) => {
+                {(certificationsSection.items || []).map((item) => {
                   const data = item.data as CertificationItem;
                   return (
                     <div key={item.id} style={{ marginBottom: "8px" }}>
@@ -106,10 +106,10 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
 
           <div className="resume-main">
             {/* Work Experience */}
-            {experienceSection && experienceSection.items.length > 0 && (
+            {experienceSection && (experienceSection.items?.length || 0) > 0 && (
               <div className="r-main-section">
                 <div className="r-main-title">{experienceSection.title}</div>
-                {experienceSection.items.map((item) => {
+                {(experienceSection.items || []).map((item) => {
                   const data = item.data as ExperienceItem;
                   return (
                     <div className="r-job" key={item.id}>
@@ -130,10 +130,10 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
             {(experienceSection?.items.length ?? 0) > 0 && <div className="r-divider"></div>}
 
             {/* Education */}
-            {educationSection && educationSection.items.length > 0 && (
+            {educationSection && (educationSection.items?.length || 0) > 0 && (
               <div className="r-main-section">
                 <div className="r-main-title">{educationSection.title}</div>
-                {educationSection.items.map((item) => {
+                {(educationSection.items || []).map((item) => {
                   const data = item.data as EducationItem;
                   return (
                     <div key={item.id} style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
@@ -151,13 +151,13 @@ export default function ModernTemplate({ resume }: { resume: Resume }) {
               </div>
             )}
 
-            {(educationSection?.items.length ?? 0) > 0 && projectsSection && projectsSection.items.length > 0 && <div className="r-divider"></div>}
+            {(educationSection?.items?.length || 0) > 0 && projectsSection && (projectsSection.items?.length || 0) > 0 && <div className="r-divider"></div>}
 
             {/* Projects */}
-            {projectsSection && projectsSection.items.length > 0 && (
+            {projectsSection && (projectsSection.items?.length || 0) > 0 && (
               <div className="r-main-section">
                 <div className="r-main-title">{projectsSection.title}</div>
-                {projectsSection.items.map((item) => {
+                {(projectsSection.items || []).map((item) => {
                   const data = item.data as ProjectItem;
                   return (
                     <div className="r-job" key={item.id}>

@@ -34,10 +34,10 @@ export default function ProfessionalTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
 
-          {experienceSection && experienceSection.items.length > 0 && (
+          {experienceSection && (experienceSection.items?.length || 0) > 0 && (
             <div className="rp-section">
               <div className="rp-stitle"><div className="rp-bar"></div><div className="rp-sname">{experienceSection.title}</div><div className="rp-sline"></div></div>
-              {experienceSection.items.map((item) => {
+              {(experienceSection.items || []).map((item) => {
                 const data = item.data as ExperienceItem;
                 return (
                   <div className="rp-item" key={item.id}>
@@ -55,10 +55,10 @@ export default function ProfessionalTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
 
-          {educationSection && educationSection.items.length > 0 && (
+          {educationSection && (educationSection.items?.length || 0) > 0 && (
             <div className="rp-section">
               <div className="rp-stitle"><div className="rp-bar"></div><div className="rp-sname">{educationSection.title}</div><div className="rp-sline"></div></div>
-              {educationSection.items.map((item) => {
+              {(educationSection.items || []).map((item) => {
                 const data = item.data as EducationItem;
                 return (
                   <div className="rp-item" key={item.id}>
@@ -75,10 +75,10 @@ export default function ProfessionalTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
 
-          {projectsSection && projectsSection.items.length > 0 && (
+          {projectsSection && (projectsSection.items?.length || 0) > 0 && (
             <div className="rp-section">
               <div className="rp-stitle"><div className="rp-bar"></div><div className="rp-sname">{projectsSection.title}</div><div className="rp-sline"></div></div>
-              {projectsSection.items.map((item) => {
+              {(projectsSection.items || []).map((item) => {
                 const data = item.data as ProjectItem;
                 return (
                   <div className="rp-item" key={item.id}>
@@ -93,16 +93,16 @@ export default function ProfessionalTemplate({ resume }: { resume: Resume }) {
             </div>
           )}
 
-          {skillsSection && skillsSection.items.length > 0 && (
+          {skillsSection && (skillsSection.items?.length || 0) > 0 && (
             <div className="rp-section">
               <div className="rp-stitle"><div className="rp-bar"></div><div className="rp-sname">{skillsSection.title}</div><div className="rp-sline"></div></div>
               <div className="rp-item" style={{ fontSize: "11px", color: "#374151" }}>
-                {skillsSection.items.map((item, index) => {
+                {(skillsSection.items || []).map((item, index) => {
                   const data = item.data as SkillsItem;
                   return (
                     <span key={item.id}>
                       {data.name}
-                      {index < skillsSection.items.length - 1 ? <span> &nbsp;|&nbsp; </span> : ""}
+                      {index < (skillsSection.items?.length || 0) - 1 ? <span> &nbsp;|&nbsp; </span> : ""}
                     </span>
                   );
                 })}

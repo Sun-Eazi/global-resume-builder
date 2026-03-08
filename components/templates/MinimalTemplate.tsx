@@ -33,10 +33,10 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
           </p>
         )}
 
-        {experienceSection && experienceSection.items.length > 0 && (
+        {experienceSection && (experienceSection.items?.length || 0) > 0 && (
           <div className="rm-section">
             <div className="rm-stitle">{experienceSection.title}</div>
-            {experienceSection.items.map((item) => {
+            {(experienceSection.items || []).map((item) => {
               const data = item.data as ExperienceItem;
               return (
                 <div className="rm-row" key={item.id}>
@@ -54,10 +54,10 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
           </div>
         )}
 
-        {educationSection && educationSection.items.length > 0 && (
+        {educationSection && (educationSection.items?.length || 0) > 0 && (
           <div className="rm-section">
             <div className="rm-stitle">{educationSection.title}</div>
-            {educationSection.items.map((item) => {
+            {(educationSection.items || []).map((item) => {
               const data = item.data as EducationItem;
               return (
                 <div className="rm-row" key={item.id}>
@@ -74,10 +74,10 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
           </div>
         )}
 
-        {projectsSection && projectsSection.items.length > 0 && (
+        {projectsSection && (projectsSection.items?.length || 0) > 0 && (
           <div className="rm-section">
             <div className="rm-stitle">{projectsSection.title}</div>
-            {projectsSection.items.map((item) => {
+            {(projectsSection.items || []).map((item) => {
               const data = item.data as ProjectItem;
               return (
                 <div className="rm-row" key={item.id}>
@@ -95,10 +95,10 @@ export default function MinimalTemplate({ resume }: { resume: Resume }) {
           </div>
         )}
 
-        {skillsSection && skillsSection.items.length > 0 && (
+        {skillsSection && (skillsSection.items?.length || 0) > 0 && (
           <div className="rm-section">
             <div className="rm-stitle">{skillsSection.title}</div>
-            {skillsSection.items.map((item) => {
+            {(skillsSection.items || []).map((item) => {
               const data = item.data as SkillsItem;
               return <span key={item.id} className="rm-skill">{data.name}</span>;
             })}
